@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+$stdout.sync = true
+
+require 'awesome_print'
+require_relative 'remuxer'
+
+remuxed = []
+
+puts `mkvmerge --version`
+
+while true
+  incoming = Dir["/source/**"]
+  incoming = incoming - remuxed
+
+  incoming.each do |path|
+    begin
+      Remuxer.auto_remux(path, "/sink")
+      remuxed << path
+    rescue Exception => e
+      puts e
+      puts "failed remuxing #{path}"
+    end
+  end
+  sleep 5
+end
